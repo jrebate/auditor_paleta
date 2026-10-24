@@ -22,7 +22,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 main.cz-wrap { display: grid; gap: 44px; padding-block: 48px 64px; }
 .hero { display: grid; gap: 16px; }
 .hero .cz-display-xl { max-width: 16ch; }
-.hero .cz-lead { max-width: 58ch; }
+.hero .cz-lead { max-width: none; }
 h2.cz-section-title { margin: 0; }
 
 .top-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; align-items: start; }
@@ -108,6 +108,7 @@ table.matrix thead th.corner { left: 0; z-index: 3; }
 .empty { padding: 28px; color: var(--cz-muted-fg); }
 
 details.list summary { cursor: pointer; font-weight: 600; }
+details.list:not([open]) { gap: 0; }
 .pairs { width: 100%; border-collapse: collapse; font-size: .9rem; }
 .pairs th, .pairs td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--cz-rule); vertical-align: middle; }
 .pairs th { font-family: var(--cz-font-mono); font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--cz-muted-fg); font-weight: 400; }
@@ -141,10 +142,10 @@ dialog::backdrop { background: color-mix(in oklab, var(--cz-ink) 55%, transparen
 .pro .cz-display-md { margin: 0; }
 .price { font-family: var(--cz-font-mono); }
 .price small { color: var(--cz-muted-fg); }
-.pro ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; max-width: 70ch; }
+.pro ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
 .thanks { background: var(--cz-muted); border-radius: var(--cz-radius); padding: 8px 12px; font-size: .92rem; }
 
-.notes { display: grid; gap: 8px; color: var(--cz-muted-fg); font-size: .9rem; max-width: 80ch; }
+.notes { display: grid; gap: 8px; color: var(--cz-muted-fg); font-size: .9rem; }
 .cz-footer__inner .tagline { font-family: var(--cz-font-display); font-weight: 600; font-stretch: 92%; font-size: 1.15rem; }
 
 @media (max-width: 520px) {
