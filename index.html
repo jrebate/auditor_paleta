@@ -143,6 +143,10 @@ dialog::backdrop { background: color-mix(in oklab, var(--cz-ink) 55%, transparen
 .price { font-family: var(--cz-font-mono); }
 .price small { color: var(--cz-muted-fg); }
 .pro ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+.pro-ask { margin: 0; font-weight: 600; }
+.pro-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.pro-contact { margin: 0; font-size: .94rem; }
+.pro-contact a { overflow-wrap: anywhere; }
 .thanks { background: var(--cz-muted); border-radius: var(--cz-radius); padding: 8px 12px; font-size: .92rem; }
 
 .notes { display: grid; gap: 8px; color: var(--cz-muted-fg); font-size: .9rem; }
@@ -259,15 +263,19 @@ dialog::backdrop { background: color-mix(in oklab, var(--cz-ink) 55%, transparen
     <p class="cz-section-title"><span>Próximamente</span></p>
     <div class="pro-head">
       <h2 id="proTitle" class="cz-display-md">Auditor Pro</h2>
-      <span class="price">5 € al mes <small>precio previsto</small></span>
     </div>
+    <p class="pro-ask">¿Pagarías una cantidad simbólica por estas mejoras?</p>
     <ul>
       <li>Informe exportable con la matriz y tu marca, para enseñar al cliente o al equipo.</li>
       <li>El color corregido más cercano para cada par que no llega, manteniendo el tono.</li>
       <li>Tokens corregidos listos para pegar en JSON, CSS o Tailwind.</li>
     </ul>
-    <div><button type="button" class="cz-btn" id="proBtn">Me interesa <span class="cz-arrow" aria-hidden="true">→</span></button></div>
+    <div class="pro-actions">
+      <button type="button" class="cz-btn" id="proBtn">Me interesa <span class="cz-arrow" aria-hidden="true">→</span></button>
+      <a class="cz-btn cz-btn--outline" href="https://ko-fi.com/jrebate" target="_blank" rel="noopener" data-track="kofi-pro">Apóyalo ya en Ko-fi</a>
+    </div>
     <div class="thanks" id="proThanks" hidden role="status">Gracias, lo tendremos en cuenta. Tu interés nos ayuda a decidir qué construir. Mientras tanto, la matriz es gratis.</div>
+    <p class="pro-contact">¿Te interesa mucho o echas algo en falta? Escríbeme, soy Jorge: <a href="mailto:jrebateserrano@gmail.com" data-track="contacto-email">jrebateserrano@gmail.com</a></p>
   </section>
 
   <section class="notes" aria-label="Notas">
