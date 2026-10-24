@@ -7,3 +7,4 @@ Web: https://jrebate.github.io/auditor_paleta/
 - Todo se calcula en el navegador; los colores no salen de él.
 - Analítica sin cookies con GoatCounter.
 - Los resultados son orientativos y no certifican la accesibilidad de un diseño.
+- Estilo visual de [CentaurUX](https://centaurux.es) (`centaurux-base.css` e isotipos en `assets/`).

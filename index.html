@@ -5,252 +5,199 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Auditor de paleta</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Pega los tokens de color de tu sistema de diseño y comprueba el contraste de todos los pares a la vez, con WCAG 2.2 y APCA.">
+<meta name="description" content="Pega los tokens de color de tu sistema de diseño y comprueba el contraste de todos los pares a la vez, con WCAG 2.2 y APCA. Una herramienta de CentaurUX.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..900&family=Inter+Tight:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Caveat:wght@500;600&display=swap">
+<link rel="stylesheet" href="centaurux-base.css">
 <style>
-/* Layout: entrada y resumen arriba (dos columnas, una en móvil); la matriz ocupa todo el ancho debajo, con cabeceras fijas al desplazarse. */
-:root {
-  --paper: #f3f4f7;
-  --surface: #ffffff;
-  --ink: #161a22;
-  --muted: #545b69;
-  --line: #d8dbe3;
-  --accent: #2b45c4;
-  --accent-ink: #ffffff;
-  --accent-soft: #e6eafb;
-  --ok: #17663a;
-  --ok-soft: #dff1e6;
-  --warn: #7f4b00;
-  --warn-soft: #faefd9;
-  --bad: #a3241c;
-  --bad-soft: #fbe5e2;
-  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
-  --font-ui: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
-  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
-  --radius: 10px;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper: #0f1116; --surface: #181b23; --ink: #e8eaf0; --muted: #a2a8b6; --line: #2d323e;
-    --accent: #98a9ff; --accent-ink: #0d1433; --accent-soft: #1e2542;
-    --ok: #79d39a; --ok-soft: #15301f; --warn: #f0b85f; --warn-soft: #352711; --bad: #ff9187; --bad-soft: #3a1a18;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --paper: #0f1116; --surface: #181b23; --ink: #e8eaf0; --muted: #a2a8b6; --line: #2d323e;
-  --accent: #98a9ff; --accent-ink: #0d1433; --accent-soft: #1e2542;
-  --ok: #79d39a; --ok-soft: #15301f; --warn: #f0b85f; --warn-soft: #352711; --bad: #ff9187; --bad-soft: #3a1a18;
-  color-scheme: dark;
-}
-* { box-sizing: border-box; }
+/* Layout: cabecera carbón de CentaurUX; portada alineada a la izquierda; entrada y resumen en dos columnas; matriz a todo el ancho con cabeceras fijas; bloque Pro en carbón. */
 [hidden] { display: none !important; }
-body {
-  background: var(--paper); color: var(--ink);
-  font-family: var(--font-ui); font-size: 1rem; line-height: 1.55; margin: 0;
-}
-.wrap {
-  max-width: 1280px; margin: 0 auto;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 28px 56px;
-  display: grid; gap: 24px;
-}
-a { color: var(--accent); }
-:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 .skip { position: absolute; left: -9999px; }
-.skip:focus { left: 16px; top: 16px; background: var(--surface); padding: 8px 12px; z-index: 20; }
+.skip:focus { left: 16px; top: 16px; background: var(--cz-card); color: var(--cz-fg); padding: 8px 12px; z-index: 60; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--cz-ink); }
+.cz-header.cz-dark { background: var(--cz-bg); }
 
-header.top { display: grid; gap: 10px; max-width: 72ch; }
-.brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; color: var(--accent); letter-spacing: .01em; }
-.brand svg { flex: none; }
-h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.7rem, 3.6vw, 2.6rem); line-height: 1.1; margin: 0; text-wrap: balance; }
-h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; line-height: 1.25; margin: 0; }
-.lede { color: var(--muted); margin: 0; font-size: 1.08rem; }
+main.cz-wrap { display: grid; gap: 44px; padding-block: 48px 64px; }
+.hero { display: grid; gap: 16px; }
+.hero .cz-display-xl { max-width: 16ch; }
+.hero .cz-lead { max-width: 58ch; }
+h2.cz-section-title { margin: 0; }
 
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; min-width: 0; }
 .top-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; align-items: start; }
 @media (max-width: 880px) { .top-grid { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--cz-card); border: 1px solid var(--cz-border); border-radius: var(--cz-radius); padding: 20px; min-width: 0; display: grid; gap: 14px; }
 
-.input-panel { display: grid; gap: 12px; }
-.input-panel label { font-weight: 700; }
-.hint { color: var(--muted); font-size: .9rem; margin: 0; }
+.input-panel > label, .control > label, .control > .lbl { font-weight: 600; font-size: .95rem; }
+.hint { color: var(--cz-muted-fg); font-size: .9rem; }
+code { font-family: var(--cz-font-mono); font-size: .88em; }
 textarea {
-  font-family: var(--font-data); font-size: .88rem; line-height: 1.5; color: var(--ink); background: var(--paper);
-  border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; width: 100%; min-height: 220px; resize: vertical; tab-size: 2;
+  font-family: var(--cz-font-mono); font-size: .86rem; line-height: 1.55; color: var(--cz-fg); background: var(--cz-bg);
+  border: 1px solid var(--cz-input); border-radius: var(--cz-radius); padding: 12px; width: 100%; min-height: 220px; resize: vertical; tab-size: 2;
 }
-textarea:focus { border-color: var(--accent); }
-.examples { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: .9rem; }
-.examples span { color: var(--muted); }
-.btn {
-  font: inherit; font-weight: 700; cursor: pointer; border-radius: 8px; padding: 9px 16px;
-  border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink);
-}
-.btn.ghost { background: transparent; color: var(--accent); }
-.btn.small { padding: 4px 10px; font-size: .88rem; font-weight: 400; }
-.btn:hover { filter: brightness(1.08); }
+textarea:focus { border-color: var(--cz-fg); }
+.examples { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.examples > span { font-size: .9rem; color: var(--cz-muted-fg); }
 .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.example-bar { background: var(--warn-soft); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; font-size: .92rem; }
-.status { font-size: .92rem; color: var(--muted); min-height: 1.4em; }
-.share-out { font-family: var(--font-data); font-size: .8rem; width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); }
+.example-bar { background: var(--cz-muted); border-radius: var(--cz-radius); padding: 8px 12px; font-size: .92rem; display: flex; gap: 10px; align-items: center; }
+.status { font-size: .92rem; color: var(--cz-muted-fg); min-height: 1.4em; }
+.share-out { font-family: var(--cz-font-mono); font-size: .8rem; width: 100%; padding: 6px 8px; border: 1px solid var(--cz-input); border-radius: var(--cz-radius); background: var(--cz-bg); color: var(--cz-fg); }
 
-.summary { display: grid; gap: 14px; }
 .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-.stat { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: var(--paper); min-width: 0; }
-.stat b { display: block; font-family: var(--font-data); font-size: 1.5rem; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.2; }
-.stat span { font-size: .84rem; color: var(--muted); }
-.controls { display: grid; gap: 10px; }
-.control { display: grid; gap: 4px; }
-.control > label, .control > .lbl { font-weight: 700; font-size: .92rem; }
-select { font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; width: 100%; }
-.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; width: fit-content; max-width: 100%; }
-.seg label { padding: 6px 12px; cursor: pointer; font-size: .92rem; background: var(--paper); border-right: 1px solid var(--line); }
+.stat { border: 1px solid var(--cz-rule); border-radius: var(--cz-radius); padding: 10px 12px; background: var(--cz-bg); min-width: 0; display: grid; gap: 2px; }
+.stat b { font-family: var(--cz-font-display); font-stretch: 88%; font-weight: 800; font-size: 2rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.stat span { font-size: .84rem; color: var(--cz-muted-fg); }
+.controls { display: grid; gap: 12px; }
+.control { display: grid; gap: 6px; }
+select { font: inherit; color: var(--cz-fg); background: var(--cz-bg); border: 1px solid var(--cz-input); border-radius: var(--cz-radius); padding: 8px 10px; width: 100%; }
+.seg { display: inline-flex; border: 1px solid var(--cz-input); border-radius: 999px; overflow: hidden; width: fit-content; max-width: 100%; }
+.seg label { padding: 6px 14px; cursor: pointer; font-size: .88rem; border-right: 1px solid var(--cz-rule); }
 .seg label:last-child { border-right: 0; }
 .seg input { position: absolute; opacity: 0; pointer-events: none; }
-.seg label:has(input:checked) { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
-.seg label:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: -3px; }
+.seg label:has(input:checked) { background: var(--cz-primary); color: var(--cz-on-primary); font-weight: 500; }
+.seg label:has(input:focus-visible) { outline: 2px solid var(--cz-fg); outline-offset: -4px; }
 .check { display: flex; gap: 8px; align-items: center; font-size: .92rem; }
-.check input { accent-color: var(--accent); width: 18px; height: 18px; }
+.check input { accent-color: var(--cz-fg); width: 18px; height: 18px; }
 .orphans { font-size: .9rem; }
 .orphans ul { list-style: none; padding: 0; margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
-.orphans li { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px 2px 4px; background: var(--paper); }
-.dot { width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--line); flex: none; }
+.orphans li { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--cz-rule); border-radius: 999px; padding: 2px 10px 2px 4px; background: var(--cz-bg); }
+.dot { width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--cz-border); flex: none; }
 
 /* Matriz */
-.matrix-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 16px; }
-.legend { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: .86rem; color: var(--muted); }
-.legend .chip { margin-right: 4px; }
-.scroller { overflow: auto; max-height: 78vh; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.matrix-sec { display: grid; gap: 12px; min-width: 0; }
+.matrix-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 16px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .84rem; color: var(--cz-muted-fg); }
+.legend .chip { margin-right: 5px; }
+.matrix-note { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: baseline; }
+.scroller { overflow: auto; max-height: 78vh; border: 1px solid var(--cz-border); border-radius: var(--cz-radius); background: var(--cz-card); }
 table.matrix { border-collapse: separate; border-spacing: 0; font-size: .85rem; }
-table.matrix th, table.matrix td { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 0; }
-table.matrix thead th { position: sticky; top: 0; z-index: 2; background: var(--surface); }
-table.matrix tbody th { position: sticky; left: 0; z-index: 1; background: var(--surface); }
+table.matrix th, table.matrix td { border-right: 1px solid var(--cz-rule); border-bottom: 1px solid var(--cz-rule); padding: 0; }
+table.matrix thead th { position: sticky; top: 0; z-index: 2; background: var(--cz-card); }
+table.matrix tbody th { position: sticky; left: 0; z-index: 1; background: var(--cz-card); }
 table.matrix thead th.corner { left: 0; z-index: 3; }
-.corner-in { padding: 8px 10px; font-size: .78rem; color: var(--muted); text-align: left; line-height: 1.3; min-width: 140px; }
-.corner-in b { color: var(--ink); }
-.hdr { display: grid; gap: 4px; padding: 8px; width: 112px; text-align: left; font-weight: 400; }
-.hdr .sw { height: 22px; border-radius: 5px; border: 1px solid var(--line); }
-.hdr .nm { font-weight: 700; font-size: .8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.hdr .hx { font-family: var(--font-data); font-size: .74rem; color: var(--muted); }
+.corner-in { padding: 8px 10px; text-align: left; line-height: 1.5; min-width: 140px; font-family: var(--cz-font-mono); font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--cz-muted-fg); font-weight: 400; }
+.corner-in b { color: var(--cz-fg); font-weight: 500; }
+.hdr { display: grid; gap: 4px; padding: 8px; width: 126px; text-align: left; font-weight: 400; }
+.hdr .sw { height: 22px; border-radius: 2px; border: 1px solid var(--cz-border); }
+.hdr .nm, .rhdr .nm { font-weight: 600; font-size: .8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hdr .hx, .rhdr .hx { font-family: var(--cz-font-mono); font-size: .72rem; color: var(--cz-muted-fg); }
 .rhdr { display: flex; gap: 8px; align-items: center; padding: 8px 10px; width: 160px; text-align: left; font-weight: 400; }
-.rhdr .sw { width: 22px; height: 22px; border-radius: 5px; border: 1px solid var(--line); flex: none; }
+.rhdr .sw { width: 22px; height: 22px; border-radius: 2px; border: 1px solid var(--cz-border); flex: none; }
 .rhdr div { min-width: 0; }
-.rhdr .nm { display: block; font-weight: 700; font-size: .8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.rhdr .hx { font-family: var(--font-data); font-size: .74rem; color: var(--muted); }
-.cell {
-  display: grid; width: 112px; border: 0; padding: 0; margin: 0; background: var(--surface); color: var(--ink);
-  font: inherit; cursor: pointer; text-align: left;
-}
-.cell .smp { height: 46px; display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; position: relative; }
+.rhdr .nm { display: block; }
+.cell { display: grid; width: 126px; border: 0; padding: 0; margin: 0; background: var(--cz-card); color: var(--cz-fg); font: inherit; cursor: pointer; text-align: left; }
+.cell .smp { height: 46px; display: grid; place-items: center; font-family: var(--cz-font-display); font-stretch: 88%; font-weight: 800; font-size: 1.35rem; position: relative; }
 .cell .val { display: grid; gap: 3px; padding: 6px 8px 7px; }
 .cell .ln { display: flex; justify-content: space-between; align-items: center; gap: 4px; }
-.cell .num { font-family: var(--font-data); font-size: .8rem; font-variant-numeric: tabular-nums; }
-.cell:hover .val, .cell:focus-visible .val { background: var(--accent-soft); }
+.cell .num { font-family: var(--cz-font-mono); font-size: .78rem; font-variant-numeric: tabular-nums; }
+.cell:hover .val, .cell:focus-visible .val { background: var(--cz-muted); }
+.cell:focus-visible { outline: 2px solid var(--cz-fg); outline-offset: -2px; }
 .cell.dim .smp { opacity: .22; }
-.cell.dim .smp::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(135deg, transparent 0 6px, var(--line) 6px 7px); }
+.cell.dim .smp::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(135deg, transparent 0 6px, var(--cz-rule) 6px 7px); }
 .cell.dim .val { opacity: .55; }
 .cell.gone .smp, .cell.gone .val { visibility: hidden; }
-.same { width: 112px; height: 100%; min-height: 94px; display: grid; place-items: center; color: var(--muted); background: repeating-linear-gradient(135deg, var(--paper) 0 6px, var(--surface) 6px 12px); }
-.chip { display: inline-block; font-size: .72rem; font-weight: 700; line-height: 1.4; padding: 0 6px; border-radius: 4px; white-space: nowrap; border: 1px solid transparent; }
-.c-aaa { background: var(--ok); color: var(--surface); }
-.c-aa { background: var(--ok-soft); color: var(--ok); border-color: var(--ok); }
-.c-lg { background: var(--warn-soft); color: var(--warn); border-color: var(--warn); }
-.c-no { background: var(--bad-soft); color: var(--bad); border-color: var(--bad); }
-.c-apca { background: var(--paper); color: var(--ink); border-color: var(--line); font-weight: 400; }
-.empty { padding: 28px; text-align: center; color: var(--muted); }
+.same { width: 126px; height: 100%; min-height: 94px; display: grid; place-items: center; color: var(--cz-muted-fg); background: repeating-linear-gradient(135deg, var(--cz-bg) 0 6px, var(--cz-card) 6px 12px); }
+.chip { display: inline-flex; align-items: center; gap: 4px; font-family: var(--cz-font-mono); font-size: .6rem; letter-spacing: .04em; text-transform: uppercase; line-height: 1.5; padding: 0 5px; border-radius: 2px; white-space: nowrap; border: 1px solid transparent; }
+.c-aaa { background: var(--cz-primary); color: var(--cz-on-primary); }
+.c-aa { border-color: var(--cz-fg); color: var(--cz-fg); }
+.c-lg { border-color: var(--cz-muted-fg); border-style: dashed; color: var(--cz-fg); }
+.c-no { border-color: var(--cz-destructive); color: var(--cz-fg); }
+.c-no::before { content: ""; width: 6px; height: 6px; border-radius: 1px; background: var(--cz-destructive); }
+.c-apca { border-color: var(--cz-rule); color: var(--cz-muted-fg); text-transform: none; letter-spacing: 0; }
+.empty { padding: 28px; color: var(--cz-muted-fg); }
 
-details.list { font-size: .95rem; }
-details.list summary { cursor: pointer; font-weight: 700; }
-.pairs { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: .9rem; }
-.pairs th, .pairs td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
-.pairs td.num { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
-.pairs .pv { display: inline-block; padding: 2px 10px; border-radius: 5px; font-weight: 700; border: 1px solid var(--line); }
+details.list summary { cursor: pointer; font-weight: 600; }
+.pairs { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.pairs th, .pairs td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--cz-rule); vertical-align: middle; }
+.pairs th { font-family: var(--cz-font-mono); font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--cz-muted-fg); font-weight: 400; }
+.pairs td.num { font-family: var(--cz-font-mono); font-variant-numeric: tabular-nums; }
+.pairs .pv { display: inline-block; padding: 2px 10px; border-radius: 2px; font-family: var(--cz-font-display); font-weight: 800; border: 1px solid var(--cz-border); }
 .list-scroll { overflow-x: auto; }
 
 /* Detalle */
-dialog { border: 1px solid var(--line); border-radius: 14px; padding: 0; width: min(560px, calc(100vw - 32px)); background: var(--surface); color: var(--ink); }
-dialog::backdrop { background: rgba(10, 12, 18, .5); }
-.dlg { display: grid; gap: 14px; padding: 18px; }
+dialog { border: 1px solid var(--cz-border); border-radius: var(--cz-radius); padding: 0; width: min(560px, calc(100vw - 32px)); background: var(--cz-card); color: var(--cz-fg); }
+dialog::backdrop { background: color-mix(in oklab, var(--cz-ink) 55%, transparent); }
+.dlg { display: grid; gap: 16px; padding: 20px; }
 .dlg-head { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
-.x { font: inherit; font-size: 1.4rem; line-height: 1; background: none; border: 0; color: var(--muted); cursor: pointer; padding: 2px 8px; border-radius: 6px; }
-.preview { border-radius: 10px; padding: 16px; display: grid; gap: 8px; border: 1px solid var(--line); }
-.preview p { margin: 0; }
+.x { font: inherit; font-size: 1.4rem; line-height: 1; background: none; border: 0; color: var(--cz-muted-fg); cursor: pointer; padding: 2px 8px; border-radius: var(--cz-radius); }
+.preview { border-radius: var(--cz-radius); padding: 16px; display: grid; gap: 8px; border: 1px solid var(--cz-border); }
 .pv-body { font-size: 16px; }
-.pv-large { font-size: 24px; font-weight: 700; line-height: 1.2; font-family: var(--font-display); }
+.pv-large { font-family: var(--cz-font-display); font-stretch: 92%; font-size: 24px; font-weight: 700; line-height: 1.15; }
 .pv-ui { display: flex; gap: 10px; align-items: center; font-size: 14px; }
-.pv-ui .box { border: 2px solid currentColor; border-radius: 6px; padding: 2px 10px; }
+.pv-ui .box { border: 2px solid currentColor; border-radius: 999px; padding: 2px 12px; }
+.big-row { display: flex; flex-wrap: wrap; gap: 8px 28px; align-items: end; }
+.big-row small { display: block; }
+.big { font-family: var(--cz-font-display); font-stretch: 88%; font-size: 2.2rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
 .res { width: 100%; border-collapse: collapse; font-size: .9rem; }
-.res th, .res td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
-.res td.num { font-family: var(--font-data); white-space: nowrap; }
-.big { font-family: var(--font-data); font-size: 1.6rem; font-weight: 600; font-variant-numeric: tabular-nums; }
-.big-row { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline; }
-.big-row small { color: var(--muted); font-size: .85rem; display: block; }
-.pro-mini { border: 1px dashed var(--accent); border-radius: 10px; padding: 12px; background: var(--accent-soft); display: grid; gap: 8px; font-size: .92rem; }
+.res th, .res td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--cz-rule); vertical-align: top; }
+.res th { font-family: var(--cz-font-mono); font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--cz-muted-fg); font-weight: 400; }
+.res td.num { font-family: var(--cz-font-mono); white-space: nowrap; }
+.pro-mini { border: 1px dashed var(--cz-input); border-radius: var(--cz-radius); padding: 12px; background: var(--cz-bg); display: grid; gap: 10px; font-size: .92rem; }
 
 /* Pro */
-.pro { display: grid; gap: 12px; border: 1px solid var(--accent); }
+.pro { display: grid; gap: 14px; padding: 28px; border-radius: var(--cz-radius); border: 1px solid var(--cz-border); }
 .pro-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; align-items: baseline; }
-.price { font-family: var(--font-data); font-weight: 600; }
-.price small { font-family: var(--font-ui); font-weight: 400; color: var(--muted); }
-.pro ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
-.thanks { background: var(--ok-soft); border-radius: 8px; padding: 8px 12px; font-size: .92rem; }
+.pro .cz-display-md { margin: 0; }
+.price { font-family: var(--cz-font-mono); }
+.price small { color: var(--cz-muted-fg); }
+.pro ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; max-width: 70ch; }
+.thanks { background: var(--cz-muted); border-radius: var(--cz-radius); padding: 8px 12px; font-size: .92rem; }
 
-.foot { color: var(--muted); font-size: .9rem; display: grid; gap: 6px; max-width: 80ch; }
-.foot p { margin: 0; }
+.notes { display: grid; gap: 8px; color: var(--cz-muted-fg); font-size: .9rem; max-width: 80ch; }
+.cz-footer__inner .tagline { font-family: var(--cz-font-display); font-weight: 600; font-stretch: 92%; font-size: 1.15rem; }
 
 @media (max-width: 520px) {
+  main.cz-wrap { padding-block: 32px 48px; gap: 36px; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .stats .stat:last-child { grid-column: span 2; }
   .rhdr { width: 104px; padding: 6px; }
   .rhdr .sw { display: none; }
   .corner-in { min-width: 0; }
-  .stats { grid-template-columns: 1fr 1fr; }
-  .stats .stat:last-child { grid-column: span 2; }
+  .cz-header__tag { display: none; }
 }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 </head>
 <body>
 <a class="skip" href="#matriz">Saltar a la matriz</a>
-<div class="wrap">
-  <header class="top">
-    <div class="brand">
-      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
-        <rect x="1" y="1" width="11" height="11" rx="2" fill="currentColor"/>
-        <rect x="14" y="1" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
-        <rect x="1" y="14" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
-        <rect x="14" y="14" width="11" height="11" rx="2" fill="currentColor" opacity=".45"/>
-      </svg>
-      Auditor de paleta
-    </div>
-    <h1>Comprueba el contraste de todos los pares de tu paleta a la vez</h1>
-    <p class="lede">Pega tus tokens de color en JSON, variables CSS o una lista de hex. Verás la matriz completa de texto sobre fondo con WCAG 2.2 y APCA. Todo se calcula en tu navegador.</p>
-  </header>
+<header class="cz-header cz-dark">
+  <div class="cz-wrap cz-header__inner">
+    <a class="cz-wordmark" href="https://centaurux.es" target="_blank" rel="noopener" data-track="ir-centaurux"><img src="assets/centaurux-iso-blanco.png" alt="" width="31" height="28"><span>CentaurUX</span></a>
+    <span class="cz-header__tag">Research, redesigned.</span>
+    <div class="cz-header__actions"><span class="cz-badge cz-badge--ghost">Auditor de paleta</span></div>
+  </div>
+</header>
+
+<main class="cz-wrap">
+  <section class="hero" aria-labelledby="h1">
+    <p class="cz-label">Herramienta gratuita · Auditor de paleta</p>
+    <h1 class="cz-display-xl" id="h1">El contraste de toda tu paleta, <span class="cz-marker">a la vez</span></h1>
+    <p class="cz-lead">Pega tus tokens de color en JSON, variables CSS o una lista de hex. Verás la matriz completa de texto sobre fondo con WCAG 2.2 y APCA. Todo se calcula en tu navegador.</p>
+  </section>
 
   <div class="top-grid">
     <section class="panel input-panel" aria-labelledby="entradaTitle">
-      <h2 id="entradaTitle" class="sr">Tu paleta</h2>
+      <h2 id="entradaTitle" class="cz-section-title">Tu paleta</h2>
       <label for="entrada">Tus colores</label>
       <p class="hint" id="entradaHint">Acepta tokens JSON (formato W3C con <code>$value</code>, Tokens Studio o un objeto simple, con alias como <code>{color.primario}</code>), variables CSS o Sass, enlaces de Coolors y listas de hex, rgb() u hsl(). Hasta 40 colores.</p>
       <textarea id="entrada" spellcheck="false" aria-describedby="entradaHint" autocomplete="off"></textarea>
       <div class="examples">
         <span>Probar con un ejemplo:</span>
-        <button type="button" class="btn ghost small" data-ex="css">Variables CSS</button>
-        <button type="button" class="btn ghost small" data-ex="json">Tokens JSON</button>
-        <button type="button" class="btn ghost small" data-ex="hex">Lista de hex</button>
+        <button type="button" class="cz-btn cz-btn--outline" data-ex="css">Variables CSS</button>
+        <button type="button" class="cz-btn cz-btn--outline" data-ex="json">Tokens JSON</button>
+        <button type="button" class="cz-btn cz-btn--outline" data-ex="hex">Lista de hex</button>
       </div>
-      <div class="example-bar" id="exampleBar" hidden>Estás viendo una paleta de ejemplo ficticia. Pega la tuya para analizarla.</div>
+      <div class="example-bar" id="exampleBar" hidden><span class="cz-dot cz-dot--violet" aria-hidden="true"></span>Estás viendo una paleta de ejemplo ficticia. Pega la tuya para analizarla.</div>
       <div class="row">
-        <button type="button" class="btn" id="analizar">Analizar paleta</button>
-        <button type="button" class="btn ghost" id="compartir">Copiar enlace a esta paleta</button>
+        <button type="button" class="cz-btn" id="analizar">Analizar paleta <span class="cz-arrow" aria-hidden="true">→</span></button>
+        <button type="button" class="cz-btn cz-btn--outline" id="compartir">Copiar enlace a esta paleta</button>
       </div>
       <input class="share-out" id="shareOut" type="text" readonly aria-label="Enlace a esta paleta" hidden>
       <div class="status" id="status" role="status"></div>
     </section>
 
     <section class="panel summary" aria-labelledby="resumenTitle">
-      <h2 id="resumenTitle">Resumen</h2>
+      <h2 id="resumenTitle" class="cz-section-title">Resumen</h2>
       <div class="stats">
         <div class="stat"><b id="sColores">0</b><span>colores</span></div>
         <div class="stat"><b id="sPares">0</b><span>combinaciones de texto y fondo</span></div>
@@ -286,9 +233,9 @@ dialog::backdrop { background: rgba(10, 12, 18, .5); }
     </section>
   </div>
 
-  <section aria-labelledby="matrizTitle" style="display:grid; gap:12px; min-width:0">
+  <section class="matrix-sec" aria-labelledby="matrizTitle">
     <div class="matrix-head">
-      <h2 id="matrizTitle">Matriz de contraste</h2>
+      <h2 id="matrizTitle" class="cz-section-title">Matriz de contraste</h2>
       <div class="legend" aria-label="Leyenda">
         <span><span class="chip c-aaa">AAA</span>7:1 o más</span>
         <span><span class="chip c-aa">AA</span>4,5:1 o más</span>
@@ -296,7 +243,10 @@ dialog::backdrop { background: rgba(10, 12, 18, .5); }
         <span><span class="chip c-no">No llega</span>menos de 3:1</span>
       </div>
     </div>
-    <p class="hint">Filas: color del texto. Columnas: color del fondo. Pulsa una celda para ver el detalle y una vista previa.</p>
+    <div class="matrix-note">
+      <p class="hint">Filas: color del texto. Columnas: color del fondo.</p>
+      <p class="cz-hand">Pulsa una celda para ver el detalle →</p>
+    </div>
     <div class="scroller" id="matriz" tabindex="0" role="region" aria-label="Matriz de contraste, desplazable"></div>
     <details class="list panel" id="listaWrap">
       <summary>Ver como lista los pares que llegan al umbral</summary>
@@ -304,9 +254,10 @@ dialog::backdrop { background: rgba(10, 12, 18, .5); }
     </details>
   </section>
 
-  <section class="panel pro" aria-labelledby="proTitle">
+  <section class="pro cz-dark" aria-labelledby="proTitle">
+    <p class="cz-section-title"><span>Próximamente</span></p>
     <div class="pro-head">
-      <h2 id="proTitle">Auditor Pro · próximamente</h2>
+      <h2 id="proTitle" class="cz-display-md">Auditor Pro</h2>
       <span class="price">5 € al mes <small>precio previsto</small></span>
     </div>
     <ul>
@@ -314,22 +265,33 @@ dialog::backdrop { background: rgba(10, 12, 18, .5); }
       <li>El color corregido más cercano para cada par que no llega, manteniendo el tono.</li>
       <li>Tokens corregidos listos para pegar en JSON, CSS o Tailwind.</li>
     </ul>
-    <div><button type="button" class="btn" id="proBtn">Me interesa</button></div>
+    <div><button type="button" class="cz-btn" id="proBtn">Me interesa <span class="cz-arrow" aria-hidden="true">→</span></button></div>
     <div class="thanks" id="proThanks" hidden role="status">Gracias, lo tendremos en cuenta. Tu interés nos ayuda a decidir qué construir. Mientras tanto, la matriz es gratis.</div>
   </section>
 
-  <footer class="foot">
+  <section class="notes" aria-label="Notas">
     <p>El ratio de contraste sigue la fórmula de WCAG 2.2 (criterios 1.4.3, 1.4.6 y 1.4.11). El valor Lc sigue APCA 0.0.98G-4g, un método en desarrollo que no forma parte de WCAG 2.2. Los colores con transparencia se calculan sobre blanco.</p>
     <p>Los resultados son orientativos. El contraste es solo una parte de la accesibilidad: que un par llegue a un umbral no garantiza que un diseño sea accesible.</p>
     <p>¿Necesitas la declaración de accesibilidad de tu web? Prueba el <a href="https://jrebate.github.io/declarador_accesibilidad/" target="_blank" rel="noopener" data-track="ir-declarador">Declarador de accesibilidad</a>. ¿Te resulta útil? Puedes <a href="https://ko-fi.com/jrebate" target="_blank" rel="noopener" data-track="kofi-pie">invitarnos a un café en Ko-fi</a>.</p>
     <p><strong>Privacidad:</strong> tus colores no salen de tu navegador. Contamos visitas y clics con <a href="https://www.goatcounter.com/" target="_blank" rel="noopener">GoatCounter</a>, que no usa cookies ni guarda datos personales.</p>
-  </footer>
-</div>
+  </section>
+</main>
+
+<footer class="cz-footer">
+  <div class="cz-wrap cz-footer__inner">
+    <span class="tagline">Human + AI = Centaur</span>
+    <a class="cz-wordmark" href="https://centaurux.es" target="_blank" rel="noopener" data-track="ir-centaurux-pie">
+      <img class="cz-logo--light-bg" src="assets/centaurux-iso-negro.png" alt="" width="31" height="28">
+      <img class="cz-logo--dark-bg" src="assets/centaurux-iso-blanco.png" alt="" width="31" height="28">
+      <span>CentaurUX</span>
+    </a>
+  </div>
+</footer>
 
 <dialog id="dlg" aria-labelledby="dlgTitle">
   <div class="dlg">
     <div class="dlg-head">
-      <h2 id="dlgTitle"></h2>
+      <h2 id="dlgTitle" class="cz-display-md"></h2>
       <button type="button" class="x" id="dlgClose" aria-label="Cerrar">×</button>
     </div>
     <div class="preview" id="dlgPreview">
@@ -341,8 +303,8 @@ dialog::backdrop { background: rgba(10, 12, 18, .5); }
       </div>
     </div>
     <div class="big-row">
-      <div><small>Ratio WCAG 2.2</small><span class="big" id="dlgRatio"></span></div>
-      <div><small>APCA</small><span class="big" id="dlgLc"></span></div>
+      <div><small class="cz-label">Ratio WCAG 2.2</small><span class="big" id="dlgRatio"></span></div>
+      <div><small class="cz-label">APCA</small><span class="big" id="dlgLc"></span></div>
     </div>
     <table class="res">
       <caption class="sr">Resultado por criterio</caption>
@@ -351,11 +313,11 @@ dialog::backdrop { background: rgba(10, 12, 18, .5); }
     </table>
     <div class="pro-mini" id="dlgPro">
       <span><strong>¿No llega?</strong> En la versión Pro te propondremos el color más cercano que sí llega, manteniendo el tono.</span>
-      <div><button type="button" class="btn small" id="dlgProBtn">Me interesa</button></div>
+      <div><button type="button" class="cz-btn" id="dlgProBtn">Me interesa</button></div>
       <div class="thanks" id="dlgProThanks" hidden role="status">Gracias, lo tendremos en cuenta.</div>
     </div>
     <div class="row">
-      <button type="button" class="btn ghost" id="dlgSwap">Invertir texto y fondo</button>
+      <button type="button" class="cz-btn cz-btn--outline" id="dlgSwap">Invertir texto y fondo</button>
     </div>
   </div>
 </dialog>
